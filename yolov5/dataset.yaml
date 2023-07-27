@@ -3,5 +3,5 @@ train: screenshots # imagenes de entrenamiento
 val: screenshots # imagenes de valor
 
 # clases
-nc: 1
-names: ['cara']
+nc: 2
+names: ['cara', 'glasses']

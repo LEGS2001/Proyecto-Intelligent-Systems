@@ -1,5 +1,5 @@
 import cv2
-
+import time
 # crea el objeto camara 
 cam = cv2.VideoCapture(0) 
 
@@ -19,8 +19,11 @@ while True:
 
     # toma screenshots mientras se presione la tecla s
     if ch == ord('s'): 
-        cv2.imwrite(f'tools/data/screenshots/screenshot{screenshot_number}.png', cam.read()[1])
-        screenshot_number += 1
+        for i in range(20):
+            cv2.imwrite(f'tools/data/screenshots/screenshot{screenshot_number}.png', cam.read()[1])
+            time.sleep(0.1)
+            screenshot_number += 1
+            
 
 # guarda el id de la ultima imagen para poder seguir desde ahi
 with open('tools/screenshot_num.txt', 'w') as file:

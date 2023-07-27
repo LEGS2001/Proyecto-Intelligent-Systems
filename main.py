@@ -25,21 +25,48 @@ import cv2
 #    c) Esperar a que entrene el modelo
 
 
-# TODO: ponerle un label a las imagenes de la carpeta screenshots usando labelImg en cmd
-# utilizando los labes de los datos entrenados crear un modelo para una CNN
+# TODO:
 # mostrar los objetos aprendidos en el modelo usadno CV2 (mostrar un video en pantalla con un cuadrado de los objetos)
 # objetivo principal del proyecto: mostrar si una persona esta usando un accesorio (gorra, lentes, reloj, etc). usando el modelo entrenado
+# hacer que itere sobre todas las caras que encuentre en pantalla y no solo una
+# mejorar el modelo: usando mas imagenes, de mejor calidad, y mas epochs
  
-nombre_entrenamiento = "exp2"
+nombre_entrenamiento = "exp13"
 model = torch.hub.load('yolov5', 'custom', source='local', path=f'yolov5/runs/train/{nombre_entrenamiento}/weights/best.pt')
 
 print('Modelo cargado')
 
 cam = cv2.VideoCapture(0)
+other_bboxes = []
 while True:
-    ret, vid = cam.read()
-    results = model(vid)
-    cv2.imshow('YOLO', np.squeeze(results.render()))
+    status, frame = cam.read()
+
+    results = model(frame)
+    df = results.pandas().xyxy[0]
+    for i in range(df.shape[0]):
+        bbox = df.iloc[i][['xmin','ymin','xmax','ymax']].values.astype(int)
+        cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (255, 0, 0), 2)
+        cv2.putText(frame, f"{df.iloc[i]['name']}: {round(df.iloc[i]['confidence'], 4)}", (bbox[0], bbox[1] - 15), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
+
+        if df.iloc[i]['name'] != 'cara':
+            other_bboxes.append(bbox)
+
+        if df.iloc[i]['name'] == 'cara':
+            cara_bbox = bbox
+
+        if 'cara_bbox' in locals(): 
+            accesorio = False
+            for other_bbox in other_bboxes:
+                if cara_bbox[0] < other_bbox[2] and cara_bbox[2] > other_bbox[0] and cara_bbox[1] < other_bbox[3] and cara_bbox[3] > other_bbox[1]:
+                    accesorio = True
+                    cv2.putText(frame, f"User is wearing {df.iloc[i]['name']}", (20, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
+
+    other_bboxes = []
+               
+    #cv2.imshow('YOLO', np.squeeze(results.render()))
+    cv2.imshow('Detection', frame)
+
     if cv2.waitKey(1) & 0xFF==ord('q'):
         break
+
 cv2.destroyAllWindows()
