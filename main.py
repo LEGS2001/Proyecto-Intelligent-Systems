@@ -31,7 +31,7 @@ import cv2
 # hacer que itere sobre todas las caras que encuentre en pantalla y no solo una
 # mejorar el modelo: usando mas imagenes, de mejor calidad, y mas epochs
  
-nombre_entrenamiento = "exp13"
+nombre_entrenamiento = "exp15"
 model = torch.hub.load('yolov5', 'custom', source='local', path=f'yolov5/runs/train/{nombre_entrenamiento}/weights/best.pt')
 
 print('Modelo cargado')
@@ -54,17 +54,22 @@ while True:
         cv2.putText(frame, f"{df.iloc[i]['name']}: {round(df.iloc[i]['confidence'], 4)}", (bbox[0], bbox[1] - 15), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
 
         if df.iloc[i]['name'] != 'cara':
-            other_bboxes.append(bbox)
+            #other_bboxes.append([bbox, df.iloc[i]['name']])
+            other_bbox = [bbox, df.iloc[i]['name']]
 
         if df.iloc[i]['name'] == 'cara':
-            cara_bboxes.append(bbox)
-
-        if len(cara_bboxes) > 0: 
-            accesorio = False
-            for cara_bbox in cara_bboxes:
-                for other_bbox in other_bboxes:
-                    if cara_bbox[0] < other_bbox[2] and cara_bbox[2] > other_bbox[0] and cara_bbox[1] < other_bbox[3] and cara_bbox[3] > other_bbox[1]:
-                        cv2.putText(frame, f"User is wearing {df.iloc[i]['name']}", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+            #cara_bboxes.append(bbox)
+            cara_bbox = bbox
+        
+        if 'cara_bbox' in locals():
+            if cara_bbox[0] < other_bbox[0][2] and cara_bbox[2] > other_bbox[0][0] and cara_bbox[1] < other_bbox[0][3] and cara_bbox[3] > other_bbox[0][1]:
+                if df.iloc[i]['name'] != 'cara':
+                    cv2.putText(frame, f"User is wearing {other_bbox[1]}", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+        #if len(cara_bboxes) > 0: 
+        #    for cara_bbox in cara_bboxes:
+        #        for other_bbox in other_bboxes:
+        #           if cara_bbox[0] < other_bbox[0][2] and cara_bbox[2] > other_bbox[0][0] and cara_bbox[1] < other_bbox[0][3] and cara_bbox[3] > other_bbox[0][1]:
+        #               cv2.putText(frame, f"User is wearing {other_bbox[1]}", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
                         
 
 

@@ -19,7 +19,7 @@ while True:
 
     # toma screenshots mientras se presione la tecla s
     if ch == ord('s'): 
-        for i in range(20):
+        for i in range(40):
             cv2.imwrite(f'tools/data/screenshots/screenshot{screenshot_number}.png', cam.read()[1])
             time.sleep(0.1)
             screenshot_number += 1
