@@ -37,7 +37,12 @@ model = torch.hub.load('yolov5', 'custom', source='local', path=f'yolov5/runs/tr
 print('Modelo cargado')
 
 cam = cv2.VideoCapture(0)
+cam.set(cv2.CAP_PROP_FRAME_WIDTH, 360)
+cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 180)
+
 other_bboxes = []
+cara_bboxes = []
+
 while True:
     status, frame = cam.read()
 
@@ -52,14 +57,16 @@ while True:
             other_bboxes.append(bbox)
 
         if df.iloc[i]['name'] == 'cara':
-            cara_bbox = bbox
+            cara_bboxes.append(bbox)
 
-        if 'cara_bbox' in locals(): 
+        if len(cara_bboxes) > 0: 
             accesorio = False
-            for other_bbox in other_bboxes:
-                if cara_bbox[0] < other_bbox[2] and cara_bbox[2] > other_bbox[0] and cara_bbox[1] < other_bbox[3] and cara_bbox[3] > other_bbox[1]:
-                    accesorio = True
-                    cv2.putText(frame, f"User is wearing {df.iloc[i]['name']}", (20, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
+            for cara_bbox in cara_bboxes:
+                for other_bbox in other_bboxes:
+                    if cara_bbox[0] < other_bbox[2] and cara_bbox[2] > other_bbox[0] and cara_bbox[1] < other_bbox[3] and cara_bbox[3] > other_bbox[1]:
+                        cv2.putText(frame, f"User is wearing {df.iloc[i]['name']}", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+                        
+
 
     other_bboxes = []
                
