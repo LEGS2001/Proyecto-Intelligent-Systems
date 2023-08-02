@@ -64,7 +64,9 @@ while True:
         if 'cara_bbox' in locals():
             if cara_bbox[0] < other_bbox[0][2] and cara_bbox[2] > other_bbox[0][0] and cara_bbox[1] < other_bbox[0][3] and cara_bbox[3] > other_bbox[0][1]:
                 if df.iloc[i]['name'] != 'cara':
-                    cv2.putText(frame, f"User is wearing {other_bbox[1]}", (bbox[0], bbox[1] - 20), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+                    cv2.putText(frame, f"User is wearing {other_bbox[1]}", (bbox[0], bbox[3] + 15), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 2)
+
+        
         #if len(cara_bboxes) > 0: 
         #    for cara_bbox in cara_bboxes:
         #        for other_bbox in other_bboxes:
